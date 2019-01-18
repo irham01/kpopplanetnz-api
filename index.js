@@ -1,11 +1,19 @@
 const express = require('express');
+const bodyParser = require("body-parser");
 const morgan = require('morgan');
 const cors = require('cors');
+const mongodb = require("mongodb");
+const ObjectID = mongodb.ObjectID;
+
+const EVENTS_COLLECTION = "events";
+
+
 const app = express();
 
 app.use(express.static('public'));
 app.use(morgan('short'));
 app.use(cors());
+app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,19 +40,46 @@ const dummyEvents = [
     }
 ];
 
+// Create a database variable outside of the database connection callback to reuse the connection pool in your app.
+var db;
+
+// Connect to the database before starting the application server.
+mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", function (err, client) {
+  if (err) {
+    console.log(err);
+    process.exit(1);
+  }
+
+  // Save database object from the callback for reuse.
+  db = client.db();
+  console.log("Database connection ready");
+
+  // Initialize the app.
+  app.listen(PORT, () => {
+      console.log(`Server is listening on port ${PORT}`);
+    });
+});
+
+
 app.use((req, res, next) => {
 	console.log(`${req.method} Request Received`);
     next();
 });
 
-app.get('/about', (req, res, next) => {
+app.get('/api/about', (req, res, next) => {
     console.log(`-- ${req.path} --`);
     res.send('Success');
 });
 
-app.get('/sponsor', (req, res, next) => {
+app.get('/api/sponsor', (req, res, next) => {
     console.log(`-- ${req.path} --`);
-    res.send('Success');
+    db.collection(EVENTS_COLLECTION).find({}).toArray(function(err, events) {
+        if (err) {
+          handleError(res, err.message, "Failed to get events.");
+        } else {
+          res.status(200).json(events);
+        }
+    });
 });
 
 // app.put('/sponsor/:id', (req, res, next) => {
@@ -56,16 +91,12 @@ app.get('/sponsor', (req, res, next) => {
     // res.send(req.param.id);
 // });
 
-app.get('/event', (req, res, next) => {
+app.get('/api/event', (req, res, next) => {
     console.log(`-- ${req.path} --`);
     res.send(dummyEvents);
 });
 
-app.get('/contactrequest', (req, res, next) => {
+app.get('/api/contactrequest', (req, res, next) => {
     console.log(`-- ${req.path} --`);
     res.send('Success');
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
 });
