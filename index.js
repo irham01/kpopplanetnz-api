@@ -73,13 +73,7 @@ app.get('/api/about', (req, res, next) => {
 
 app.get('/api/sponsor', (req, res, next) => {
     console.log(`-- ${req.path} --`);
-    db.collection(EVENTS_COLLECTION).find({}).toArray(function(err, events) {
-        if (err) {
-          handleError(res, err.message, "Failed to get events.");
-        } else {
-          res.status(200).json(events);
-        }
-    });
+    res.send('Success');
 });
 
 // app.put('/sponsor/:id', (req, res, next) => {
@@ -91,9 +85,16 @@ app.get('/api/sponsor', (req, res, next) => {
     // res.send(req.param.id);
 // });
 
-app.get('/api/event', (req, res, next) => {
+app.get('/api/events', (req, res, next) => {
     console.log(`-- ${req.path} --`);
-    res.send(dummyEvents);
+    db.collection(EVENTS_COLLECTION).find({}).toArray(function(err, events) {
+        if (err) {
+          handleError(res, err.message, "Failed to get events.");
+        } else {
+          res.status(200).json(events);
+        }
+    });
+    //res.send(dummyEvents);
 });
 
 app.get('/api/contactrequest', (req, res, next) => {
