@@ -1,0 +1,18 @@
+{
+  "name": "kpopplanetnz-api",
+  "version": "1.0.0",
+  "description": "An api for kpopplanetnz website",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jacklin213",
+  "license": "ISC"
+}
