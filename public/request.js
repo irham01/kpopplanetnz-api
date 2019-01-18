@@ -8,8 +8,10 @@ $(document).ready(function() {
     if (method === 'POST' || method === 'PUT') {
       const body = {
         name: $('#name').val(),
-        number: Number($('#number').val())
+        //number: Number($('#number').val())
       };
+      //const body = $('#json').val();
+      console.log("Body: " + body);
       $.ajax({
         method: method,
         url: path,
@@ -18,7 +20,7 @@ $(document).ready(function() {
         success: handleSuccess,
         error: function(jqxhr) {
           $('#status-code').text(jqxhr.status);
-          $('#response-body').text('');
+          $('#response-body').text('Uncaught Error.n' + jqxhr.responseText);
         }
       });
     } else {
@@ -28,7 +30,7 @@ $(document).ready(function() {
         success: handleSuccess,
         error: function(jqxhr) {
           $('#status-code').text(jqxhr.status);
-          $('#response-body').text('');
+          $('#response-body').text('Uncaught Error.n' + jqxhr.responseText);
         }
       });
     }

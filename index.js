@@ -44,7 +44,7 @@ const dummyEvents = [
 var db;
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", function (err, client) {
+mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/kpopplanetnz", function (err, client) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -60,6 +60,11 @@ mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:2701
     });
 });
 
+// Generic error handler used by all endpoints.
+function handleError(res, reason, message, code) {
+  console.log("ERROR: " + reason);
+  res.status(code || 500).json({"error": message});
+}
 
 app.use((req, res, next) => {
 	console.log(`${req.method} Request Received`);
@@ -85,6 +90,10 @@ app.get('/api/sponsor', (req, res, next) => {
     // res.send(req.param.id);
 // });
 
+/*  "/api/events"
+ *    GET: finds all events
+ *    POST: creates a new event
+ */
 app.get('/api/events', (req, res, next) => {
     console.log(`-- ${req.path} --`);
     db.collection(EVENTS_COLLECTION).find({}).toArray(function(err, events) {
@@ -95,6 +104,22 @@ app.get('/api/events', (req, res, next) => {
         }
     });
     //res.send(dummyEvents);
+});
+
+app.post('/api/events', (req, res, next) => {
+    var newEvent = req.body;
+    
+    if (!req.body.name) {
+    handleError(res, "Invalid user input", "Must provide a name.", 400);
+    } else {
+    db.collection(EVENTS_COLLECTION).insertOne(newEvent, function(err, event) {
+      if (err) {
+        handleError(res, err.message, "Failed to create new event.");
+      } else {
+        res.status(201).json(event.ops[0]);
+      }
+    });
+    }
 });
 
 app.get('/api/contactrequest', (req, res, next) => {
