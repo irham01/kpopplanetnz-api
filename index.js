@@ -31,15 +31,15 @@ app.use(bodyParser.json());
 // Routes
 app.use('/api/events', eventsRouter);
 
-app.use((req, res, next) => {
-	console.log(`${req.method} Request Received`);
-    next();
-});
-
 // Generic error handler used by all endpoints.
 app.use((err, req, res) => {
     console.log("ERROR: " + err.message);
-    res.status(err.status || 500).json({"error": err.response});
+    res.status(err.status || 500).json({
+        "error": {
+            "message": err.message,
+            "response": err.response
+        }
+    });
 });
 
 app.get('/api/about', (req, res, next) => {
@@ -60,54 +60,6 @@ app.get('/api/sponsor', (req, res, next) => {
     // //SQL Delete
     // res.send(req.param.id);
 // });
-
-/*  "/api/events"
- *    GET: finds all events
- *    POST: creates a new event
- */
-app.get('/api/events', (req, res, next) => {
-    console.log(`-- ${req.path} --`);
-    db.collection(EVENTS_COLLECTION).find({}).toArray(function(err, events) {
-        if (err) {
-          handleError(res, err.message, "Failed to get events.");
-        } else {
-          res.status(200).json(events);
-        }
-    });
-    //res.send(dummyEvents);
-});
-
-app.post('/api/event', (req, res, next) => {
-    var newEvent = req.body;
-    
-    if (!req.body.name) {
-        handleError(res, "Invalid user input", "Must provide a name.", 400);
-    } else {
-        db.collection(EVENTS_COLLECTION).insertOne(newEvent, function(err, event) {
-          if (err) {
-            handleError(res, err.message, "Failed to create new event.");
-          } else {
-            res.status(201).json(event.ops[0]);
-          }
-        });
-    }
-});
-
-app.put('/api/event', (req, res, next) => {
-    var newEvent = req.body;
-    
-    if (!req.body.name) {
-        handleError(res, "Invalid user input", "Must provide a name.", 400);
-    } else {
-        db.collection(EVENTS_COLLECTION).insertOne(newEvent, function(err, event) {
-          if (err) {
-            handleError(res, err.message, "Failed to create new event.");
-          } else {
-            res.status(201).json(event.ops[0]);
-          }
-        });
-    }
-});
 
 app.get('/api/contactrequest', (req, res, next) => {
     console.log(`-- ${req.path} --`);
