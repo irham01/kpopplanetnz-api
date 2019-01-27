@@ -4,6 +4,8 @@ const morgan = require('morgan');
 const cors = require('cors');
 const mongoose = require("mongoose");
 const eventsRouter = require('./routers/eventsRouter.js');
+const profilesRouter = require('./routers/profilesRouter.js');
+const sponsorsRouter = require('./routers/sponsorsRouter.js');
 
 const app = express();
 
@@ -30,6 +32,8 @@ app.use(bodyParser.json());
 
 // Routes
 app.use('/api/events', eventsRouter);
+app.use('/api/profiles', profilesRouter);
+app.use('/api/sponsors', sponsorsRouter);
 
 // Generic error handler used by all endpoints.
 app.use((err, req, res, next) => {

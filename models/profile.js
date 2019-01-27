@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const AboutSchema = new Schema({
+const ProfileSchema = new Schema({
     name: {type: String, required: true},
     position: {type: String, required: true},
     description: {type: String, default: "Description to be added."},
@@ -11,9 +11,9 @@ const AboutSchema = new Schema({
 });
 
 //Virtual URL to reference event
-AboutSchema.virtual('url').get(function() {
-    return '/about/' + this._id;
+ProfileSchema.virtual('url').get(function() {
+    return '/profile/' + this._id;
 });
 
 //Export Event model
-module.exports = mongoose.model('About', AboutSchema);
+module.exports = mongoose.model('Profile', ProfileSchema);

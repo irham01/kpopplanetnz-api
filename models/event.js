@@ -14,7 +14,7 @@ const EventSchema = new Schema({
 
 //Virtual URL to reference event
 EventSchema.virtual('url').get(function() {
-    return '/events/' + this._id;
+    return '/event/' + this._id;
 });
 
 //Export Event model
