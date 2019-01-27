@@ -32,14 +32,19 @@ app.use(bodyParser.json());
 app.use('/api/events', eventsRouter);
 
 // Generic error handler used by all endpoints.
-app.use((err, req, res) => {
-    console.log("ERROR: " + err.message);
-    res.status(err.status || 500).json({
-        "error": {
-            "message": err.message,
-            "response": err.response
+app.use((err, req, res, next) => {
+    console.log((err.name || "ERROR") + err.message);
+    const json = 
+    {
+        error: {
+            message: err.message,
+            response: err.response
         }
-    });
+    };
+    if (process.env.ENV === 'dev') {
+        json.error.stack = err.stack;
+    }
+    res.status(err.status || 500).json(json);
 });
 
 app.get('/api/about', (req, res, next) => {

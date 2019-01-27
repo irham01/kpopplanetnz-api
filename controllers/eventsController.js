@@ -25,13 +25,23 @@ exports.event_detail = function(req, res, next) {
 }
 
 exports.event_create = function(req, res, next) {
-    const newEvent = new Event(req.body);
-    newEvent.save(err => {
+    // Create one event only
+    // const newEvent = new Event(req.body);
+    // newEvent.save(err => {
+    //     if (err) {
+    //         err.response = "Failed to create new event.";
+    //         return next(err);
+    //     } else {
+    //         res.status(201).json(newEvent);
+    //     }
+    // });
+    // Supports creation of multiple events in one go.
+    Event.insertMany(req.body, (err, events) => {
         if (err) {
-            err.response = "Failed to create new event.";
+            err.response = "Failed to create new event(s).";
             next(err);
         } else {
-            res.status(201).json(newEvent);
+            res.status(201).json(events);
         }
     });
 }
@@ -57,10 +67,15 @@ exports.event_delete = function(req, res, next) {
         req.params.id, 
         (err, event) => {
             if (err) {
-                event.resposne = "Failed to delete the event. Id: " + req.params.id;
+                err.resposne = "Failed to delete the event. Id: " + req.params.id;
                 next(err);
             } else {
-                res.status(204).send();
+                res.status(204).json({
+                    response: {
+                        message: "Succssfully deleted event id: " + req.params.id,
+                        event: event
+                    }
+                });
             }
         }
     );
