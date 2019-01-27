@@ -31,15 +31,15 @@ app.use(bodyParser.json());
 // Routes
 app.use('/api/events', eventsRouter);
 
-// Generic error handler used by all endpoints.
-function handleError(res, reason, message, code) {
-  console.log("ERROR: " + reason);
-  res.status(code || 500).json({"error": message});
-}
-
 app.use((req, res, next) => {
 	console.log(`${req.method} Request Received`);
     next();
+});
+
+// Generic error handler used by all endpoints.
+app.use((err, req, res) => {
+    console.log("ERROR: " + err.message);
+    res.status(err.status || 500).json({"error": err.response});
 });
 
 app.get('/api/about', (req, res, next) => {
