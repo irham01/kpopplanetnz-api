@@ -2,63 +2,34 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const morgan = require('morgan');
 const cors = require('cors');
-const mongodb = require("mongodb");
-const ObjectID = mongodb.ObjectID;
-
-const EVENTS_COLLECTION = "events";
-
+const mongoose = require("mongoose");
+const eventsRouter = require('./routers/eventsRouter.js');
 
 const app = express();
+
+const PORT = process.env.PORT || 3001;
+//Initiate Mongoose, handle error and print if success
+var db;
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/kpopplanetnz", { useNewUrlParser: true })
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server is listening on port ${PORT}`);
+        });
+        db = mongoose.connection;
+    })
+    .catch((err) => {
+        console.log(err);
+        process.exit(1);
+    });
 
 app.use(express.static('public'));
 app.use(morgan('short'));
 app.use(cors());
 app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 3001;
-
-const dummyEvents = [
-    {
-        eventID: 1,
-        name: 'O-week',
-        overview: 'Orientation week! Meet the team, make some friends. Have fun',
-        description: 'Orientation Week is a week full of fun and games. During this week we also have clubs expo where you can find out more about our club, Meet our staff members, Talk about KPOP and many more.',
-        startDateTime: '2018-12-25 18:51:58',
-        endDateTime: '2018-12-25 18:51:58',
-        location: 'TBC',
-        isActive: 1
-    },
-    {
-        eventID: 2,
-        name: 'New Members Night',
-        overview: 'Orientation week! First event for new Members',
-        description: 'Orientation Week is a week full of fun and games. During this week we also have clubs expo where you can find out more about our club, Meet our staff members, Talk about KPOP and many more.',
-        startDateTime: '2018-12-26 18:51:58',
-        endDateTime: '2018-12-26 18:51:58',
-        location: 'TBC',
-        isActive: 1
-    }
-];
-
-// Create a database variable outside of the database connection callback to reuse the connection pool in your app.
-var db;
-
-// Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/kpopplanetnz", function (err, client) {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
-
-  // Save database object from the callback for reuse.
-  db = client.db();
-  console.log("Database connection ready");
-
-  // Initialize the app.
-  app.listen(PORT, () => {
-      console.log(`Server is listening on port ${PORT}`);
-    });
-});
+// Routes
+app.use('/events', eventsRouter);
 
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
@@ -106,19 +77,35 @@ app.get('/api/events', (req, res, next) => {
     //res.send(dummyEvents);
 });
 
-app.post('/api/events', (req, res, next) => {
+app.post('/api/event', (req, res, next) => {
     var newEvent = req.body;
     
     if (!req.body.name) {
-    handleError(res, "Invalid user input", "Must provide a name.", 400);
+        handleError(res, "Invalid user input", "Must provide a name.", 400);
     } else {
-    db.collection(EVENTS_COLLECTION).insertOne(newEvent, function(err, event) {
-      if (err) {
-        handleError(res, err.message, "Failed to create new event.");
-      } else {
-        res.status(201).json(event.ops[0]);
-      }
-    });
+        db.collection(EVENTS_COLLECTION).insertOne(newEvent, function(err, event) {
+          if (err) {
+            handleError(res, err.message, "Failed to create new event.");
+          } else {
+            res.status(201).json(event.ops[0]);
+          }
+        });
+    }
+});
+
+app.put('/api/event', (req, res, next) => {
+    var newEvent = req.body;
+    
+    if (!req.body.name) {
+        handleError(res, "Invalid user input", "Must provide a name.", 400);
+    } else {
+        db.collection(EVENTS_COLLECTION).insertOne(newEvent, function(err, event) {
+          if (err) {
+            handleError(res, err.message, "Failed to create new event.");
+          } else {
+            res.status(201).json(event.ops[0]);
+          }
+        });
     }
 });
 
