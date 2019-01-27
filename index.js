@@ -29,7 +29,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes
-app.use('/events', eventsRouter);
+app.use('/api/events', eventsRouter);
 
 // Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
