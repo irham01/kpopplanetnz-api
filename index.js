@@ -1,8 +1,13 @@
 const express = require('express');
+// Middleware
 const bodyParser = require("body-parser");
 const morgan = require('morgan');
 const cors = require('cors');
 const mongoose = require("mongoose");
+const compression = require("compression"); 
+const helmet = require('helmet'); 
+
+// Routes
 const eventsRouter = require('./routers/eventsRouter.js');
 const profilesRouter = require('./routers/profilesRouter.js');
 const sponsorsRouter = require('./routers/sponsorsRouter.js');
@@ -25,10 +30,13 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/kpopplane
         process.exit(1);
     });
 
+// Set frontend and middlewares
 app.use(express.static('public'));
 app.use(morgan('short'));
 app.use(cors());
 app.use(bodyParser.json());
+app.use(compression());
+app.use(helmet());
 
 // Routes
 app.use('/api/events', eventsRouter);
